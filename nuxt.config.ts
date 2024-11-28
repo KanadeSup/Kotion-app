@@ -23,6 +23,9 @@ export default defineNuxtConfig({
     preference: 'dark',
     fallback: 'dark'
   },
+  css: [
+    '~/assets/css/geist_font.css',
+  ],
   modules: [
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
