@@ -27,7 +27,7 @@ export default defineNuxtConfig({
     '~/assets/css/geist_font.css',
   ],
   components: {
-    dirs: [],
+    dirs: ['~/components/ui'],
   },
   modules: [
     '@nuxtjs/tailwindcss',
