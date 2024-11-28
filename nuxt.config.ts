@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   },
   shadcn: {
     prefix: '',
-    componentDir: './src/components/shadcn'
+    componentDir: '~/components/ui',
   },
   colorMode: {
     preference: 'dark',
@@ -26,6 +26,9 @@ export default defineNuxtConfig({
   css: [
     '~/assets/css/geist_font.css',
   ],
+  components: {
+    dirs: [],
+  },
   modules: [
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
