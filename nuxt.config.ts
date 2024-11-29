@@ -1,4 +1,5 @@
 export default defineNuxtConfig({
+  compatibilityDate: '2024-11-28',
   devtools: { enabled: true },
   ssr: false,
 
@@ -17,7 +18,7 @@ export default defineNuxtConfig({
   },
   shadcn: {
     prefix: '',
-    componentDir: '~/components/ui',
+    componentDir: 'src/components/ui',
   },
   colorMode: {
     preference: 'dark',
@@ -26,9 +27,12 @@ export default defineNuxtConfig({
   css: [
     '~/assets/css/geist_font.css',
   ],
-  components: {
-    dirs: ['~/components/ui'],
-  },
+  components: [
+    {
+      path: '~/components/ui',
+      extensions: ['vue']
+    }
+  ],
   modules: [
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
