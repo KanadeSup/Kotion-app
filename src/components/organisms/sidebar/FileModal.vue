@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { IconFile } from '@tabler/icons-vue';
+import { VisuallyHidden } from "radix-vue";
 
 const open = defineModel('open', { type: Boolean, required: true });
 </script>
