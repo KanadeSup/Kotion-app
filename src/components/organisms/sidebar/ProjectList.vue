@@ -5,8 +5,18 @@ import FileItem from "./FileItem.vue";
 import ProjectPopover from "./ProjectPopover.vue";
 import DirectoryModal from "./DirectoryModal.vue";
 import FileModal from "./FileModal.vue";
+import { getFileSystemNodes } from "~/api/fileSystem";
+import type { FileSystemNode } from "~/types/fileSystem";
+
 const isDirectoryModalOpen = ref(false);
 const isFileModalOpen = ref(false);
+const fileSystemNodes = ref<FileSystemNode[]>([]);
+onMounted(async () => {
+   const res = await getFileSystemNodes();
+   if(res.ok) {
+      fileSystemNodes.value = res.data;
+   }
+});
 function openDirectoryModal() {
    isDirectoryModalOpen.value = true;
 }
@@ -27,8 +37,16 @@ function openFileModal() {
             <IconPlus class="w-4 h-4 stroke-gray-300" />
          </ProjectPopover>
       </div>
-      <DirectoryItem @open-directory-modal="openDirectoryModal" @open-file-modal="openFileModal" />
-      <FileItem />
+      <div v-for="node in fileSystemNodes" :key="node.absolutePath">
+         <DirectoryItem
+            @open-directory-modal="openDirectoryModal"
+            @open-file-modal="openFileModal"
+            v-if="node.type === 'directory'"
+            :node-data="node"
+         />
+         <FileItem v-if="node.type === 'file'" :node-data="node" />
+      </div>
+
       <DirectoryModal v-model:open="isDirectoryModalOpen" />
       <FileModal v-model:open="isFileModalOpen" />
    </div>

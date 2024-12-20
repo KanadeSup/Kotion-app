@@ -1,7 +1,7 @@
-use serde::Serialize;
-use tauri::AppHandle;
-use std::{fs, path::Path};
 use crate::store::config_store::ConfigStore;
+use serde::{Serialize, Serializer};
+use std::{fs, path::Path};
+use tauri::AppHandle;
 
 use super::CommandResult;
 
@@ -31,11 +31,21 @@ pub struct DirectoryEntry {
    children: Option<Vec<FileSystemEntry>>,
 }
 
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
 pub enum FileSystemEntry {
    File(FileEntry),
    Directory(DirectoryEntry),
+}
+
+impl Serialize for FileSystemEntry {
+   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+   where
+       S: Serializer,
+   {
+       match self {
+           FileSystemEntry::File(file_entry) => file_entry.serialize(serializer),
+           FileSystemEntry::Directory(directory_entry) => directory_entry.serialize(serializer),
+       }
+   }
 }
 
 #[tauri::command]
@@ -60,11 +70,11 @@ pub fn set_vault_path_command(app: AppHandle, vault_path: &str) -> CommandResult
 #[tauri::command]
 pub fn get_vault_path_command(app: AppHandle) -> CommandResult<Option<String>> {
    let config_store = ConfigStore::new(app);
-      return CommandResult {
-         data: config_store.get_value("vaultPath").unwrap(),
-         ok: true,
-         message: Some("Path is invalid".to_string()),
-      };
+   return CommandResult {
+      data: config_store.get_value("vaultPath").unwrap(),
+      ok: true,
+      message: Some("Path is invalid".to_string()),
+   };
 }
 
 #[tauri::command]

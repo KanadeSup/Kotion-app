@@ -41,7 +41,7 @@ impl ConfigStore {
          return Err(ConfigError::KeyNotAllowed(key.to_string()))
       }
       if let Some(value) = self.store.get(key) {
-         Ok(Some(value.to_string()))
+         Ok(Some(value.as_str().unwrap().to_string()))
       } else {
          Ok(None)
       }

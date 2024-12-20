@@ -2,7 +2,18 @@
 import { IconChevronRight, IconFilePlus, IconFolder, IconFolderCog, IconFolderPlus, IconTrash } from "@tabler/icons-vue";
 import ItemContext from "./ItemContext.vue";
 import { buttonVariants } from "~/components/ui/button";
-defineProps({});
+import type { Directory } from "~/types/fileSystem"
+import FileItem from "./FileItem.vue";
+
+const props = defineProps({
+   nodeData: {
+      type: Object as PropType<Directory>,
+      required: true
+   }
+});
+for (const node of props.nodeData.children) {
+   node.type
+}
 const isOpen = ref(false);
 const emit = defineEmits(["openDirectoryModal", "openFileModal"]);
 const contexItem = [
@@ -46,7 +57,7 @@ const contexItem = [
             :class="cn(buttonVariants({ variant: 'ghost' }), 'w-full h-auto  px-1 py-1')"
          >
             <IconFolder class="w-5 h-5 stroke-gray-300" />
-            <span class="text-sm"> Folder one</span>
+            <span class="text-sm"> {{ nodeData.name }} </span>
             <IconChevronRight
                class="w-5 h-5 stroke-gray-300 ml-auto transition-all"
                :class="isOpen ? 'rotate-90' : ''"
@@ -54,11 +65,19 @@ const contexItem = [
          </CollapsibleTrigger>
       </ItemContext>
       <CollapsibleContent>
-         <ul>
-            <li>File 1</li>
-            <li>File 2</li>
-            <li>File 3</li>
-         </ul>
+         <div
+            v-for="node in nodeData.children"
+            :key="node.absolutePath" 
+         >
+            <DirectoryItem 
+               v-if="node.type === 'directory'"
+               :node-data="node"
+            />
+            <FileItem
+               v-if="node.type === 'file'"
+               :node-data="node"
+            />
+         </div>
       </CollapsibleContent>
    </Collapsible>
 </template>

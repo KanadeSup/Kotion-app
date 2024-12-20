@@ -75,7 +75,7 @@ function handleMouseUp(event: MouseEvent) {
          <slot name="first" />
       </div>
       <div
-         :class="cn('w-[1px] bg-[#292524] cursor-e-resize', splitterClass)"
+         :class="cn('w-[2px] bg-[#292524] cursor-e-resize', splitterClass)"
          @mousedown="handleMouseDown"
       />
       <div class="w-full">

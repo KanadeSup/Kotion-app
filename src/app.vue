@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import Setup from "./components/organisms/setup/Setup.vue";
 const configStore = useConfigStore();
-await configStore.fetchVaultPath();
-const vaultPath = configStore.vaultPath;
+onMounted(async () => {
+  await configStore.fetchVaultPath();
+});
 </script>
 <template>
    <div class="h-screen font-geist">
-      <NuxtLayout name="primary-default" v-if="vaultPath !== null">
+      <NuxtLayout name="primary-default" v-if="configStore.vaultPath !== null">
          <NuxtPage />
       </NuxtLayout>
-      <Setup v-if="vaultPath == null" />
+      <Setup v-if="configStore.vaultPath == null" />
    </div>
 </template>

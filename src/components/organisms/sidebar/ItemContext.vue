@@ -4,7 +4,7 @@ type ContextMenuItem = {
    icon: any;
    iconClass?: string
    class?: string;
-   click: () => void;
+   click?: () => void;
 };
 const props = defineProps({
    items: {

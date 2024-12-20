@@ -1,11 +1,11 @@
 type BaseFileSystem = {
-   absolutePath: String;
-   name: String;
+   absolutePath: string;
+   name: string;
 };
 
 export type File = BaseFileSystem & {
    type: "file";
-   extension: String | null;
+   extension: string | null;
    fullName: string;
 };
 

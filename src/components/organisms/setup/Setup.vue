@@ -21,7 +21,7 @@ async function setVaultLocation() {
    }
    const res = await setVaultPath(vaultPath.value);
    if(res.ok) {
-      useConfigStore().fetchVaultPath()
+      await useConfigStore().fetchVaultPath()
    } else {
       inputState.value.directoryInputError = true
    }
