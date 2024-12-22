@@ -1,41 +1,51 @@
 <script setup lang="ts">
-import { IconChevronRight, IconFilePlus, IconFolder, IconFolderCog, IconFolderPlus, IconTrash } from "@tabler/icons-vue";
+import {
+   IconChevronRight,
+   IconFilePlus,
+   IconFolder,
+   IconFolderCog,
+   IconFolderPlus,
+   IconTrash,
+} from "@tabler/icons-vue";
 import ItemContext from "./ItemContext.vue";
 import { buttonVariants } from "~/components/ui/button";
-import type { Directory } from "~/types/fileSystem"
+import type { Directory } from "~/types/fileSystem";
 import FileItem from "./FileItem.vue";
+import { useModalStore } from "./modalStore";
 
 const props = defineProps({
    nodeData: {
       type: Object as PropType<Directory>,
-      required: true
-   }
+      required: true,
+   },
+   level: {
+      type: Number,
+      required: true,
+   },
 });
-for (const node of props.nodeData.children) {
-   node.type
-}
 const isOpen = ref(false);
-const emit = defineEmits(["openDirectoryModal", "openFileModal"]);
+const modalStore = useModalStore();
+const fileSystemStore = useFileSystemStore()
 const contexItem = [
    {
       name: "Create directory",
       icon: IconFolderPlus,
       click: () => {
-         emit("openDirectoryModal");
+         modalStore.openModal("directory", "Create", props.nodeData);
       },
    },
    {
       name: "Create note",
       icon: IconFilePlus,
       click: () => {
-         emit("openFileModal");
+         modalStore.openModal("file", "Create", props.nodeData);
       },
    },
    {
       name: "Edit directory",
       icon: IconFolderCog,
       click: () => {
-         console.log("Edit directory");
+         modalStore.openModal("directory", "Update", props.nodeData);
       },
    },
    {
@@ -43,8 +53,8 @@ const contexItem = [
       icon: IconTrash,
       class: "text-red-500 font-medium focus:text-red-500",
       iconClass: "stroke-red-500",
-      click: () => {
-         console.log("Delete directory");
+      click: async () => {
+         await fileSystemStore.remove(props.nodeData.absolutePath)
       },
    },
 ];
@@ -55,6 +65,7 @@ const contexItem = [
       <ItemContext :items="contexItem">
          <CollapsibleTrigger
             :class="cn(buttonVariants({ variant: 'ghost' }), 'w-full h-auto  px-1 py-1')"
+            :style="{ paddingLeft: `${level * 10 + 4}px` }"
          >
             <IconFolder class="w-5 h-5 stroke-gray-300" />
             <span class="text-sm"> {{ nodeData.name }} </span>
@@ -65,18 +76,9 @@ const contexItem = [
          </CollapsibleTrigger>
       </ItemContext>
       <CollapsibleContent>
-         <div
-            v-for="node in nodeData.children"
-            :key="node.absolutePath" 
-         >
-            <DirectoryItem 
-               v-if="node.type === 'directory'"
-               :node-data="node"
-            />
-            <FileItem
-               v-if="node.type === 'file'"
-               :node-data="node"
-            />
+         <div v-for="node in nodeData.children" :key="node.absolutePath">
+            <DirectoryItem v-if="node.type === 'directory'" :node-data="node" :level="level + 1" />
+            <FileItem v-if="node.type === 'file'" :node-data="node" :level="level + 1" />
          </div>
       </CollapsibleContent>
    </Collapsible>

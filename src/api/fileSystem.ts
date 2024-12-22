@@ -40,15 +40,43 @@ export async function createFile(path: string, name: string) {
    const res = (await invoke("create_entry_command", {
       filePath: newNodePath,
       isDir: false,
-   })) as CommandResposne<File>;
+   })) as CommandResposne<null>;
+   if (res.ok) {
+      const fileData : File = {
+         type: "file",
+         name: name,
+         parentDirectory: path,
+         absolutePath: `${path}/${name}.json`,
+         extension: "json",
+         fullName: `${name}.json`,
+      };
+      return {
+         ...res,
+         data: fileData,
+      };
+   }
+   return res;
 }
 
 export async function createDirectory(path: string, name: string) {
    const newNodePath = `${path}/${name}`;
-   (await invoke("create_entry_command", {
+   const res = (await invoke("create_entry_command", {
       filePath: newNodePath,
       isDir: true,
-   })) as CommandResposne<Directory>;
+   })) as CommandResposne<null>;
+   if (res.ok) {
+      const directoryData: Directory = {
+         type: "directory",
+         name: name,
+         parentDirectory: path,
+         absolutePath: `${path}/${name}`,
+         children: [],
+      };
+      return {
+         ...res,
+         data: directoryData,
+      } as CommandResposne<Directory>;
+   } else return res;
 }
 
 export async function deleteEntry(path: string) {
@@ -58,8 +86,8 @@ export async function deleteEntry(path: string) {
 }
 
 export async function renameEntry(entryPath: string, newName: string, isDir: boolean) {
-   return await invoke("rename_entry_command", {
+   return (await invoke("rename_entry_command", {
       filePath: entryPath,
       newName: isDir ? newName : newName + ".json",
-   }) as CommandResposne<null>;
+   })) as CommandResposne<null>;
 }

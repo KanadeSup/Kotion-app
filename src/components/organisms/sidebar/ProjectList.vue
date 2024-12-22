@@ -5,24 +5,25 @@ import FileItem from "./FileItem.vue";
 import ProjectPopover from "./ProjectPopover.vue";
 import DirectoryModal from "./DirectoryModal.vue";
 import FileModal from "./FileModal.vue";
-import { getFileSystemNodes } from "~/api/fileSystem";
-import type { FileSystemNode } from "~/types/fileSystem";
+import { useModalStore } from "./modalStore";
 
-const isDirectoryModalOpen = ref(false);
-const isFileModalOpen = ref(false);
-const fileSystemNodes = ref<FileSystemNode[]>([]);
+const modalStore = useModalStore();
+const fileSystemStore = useFileSystemStore();
+
+function openDirectoryModal(actionType: "Create" | "Update") {
+   modalStore.openModal("directory", actionType, null);
+}
+
+function openFileModal(actionType: "Create" | "Update") {
+   modalStore.openModal("file", actionType, null);
+}
+
 onMounted(async () => {
-   const res = await getFileSystemNodes();
-   if(res.ok) {
-      fileSystemNodes.value = res.data;
+   const isSuccess = await fileSystemStore.fetch();
+   if (!isSuccess) {
+      console.error(`File System fetched failed on <ProjectList>`);
    }
 });
-function openDirectoryModal() {
-   isDirectoryModalOpen.value = true;
-}
-function openFileModal() {
-   isFileModalOpen.value = true;
-}
 </script>
 
 <template>
@@ -37,17 +38,24 @@ function openFileModal() {
             <IconPlus class="w-4 h-4 stroke-gray-300" />
          </ProjectPopover>
       </div>
-      <div v-for="node in fileSystemNodes" :key="node.absolutePath">
-         <DirectoryItem
-            @open-directory-modal="openDirectoryModal"
-            @open-file-modal="openFileModal"
-            v-if="node.type === 'directory'"
-            :node-data="node"
-         />
-         <FileItem v-if="node.type === 'file'" :node-data="node" />
+      <div
+         v-if="fileSystemStore.data"
+         v-for="node in fileSystemStore.data"
+         :key="node.absolutePath"
+      >
+         <DirectoryItem v-if="node.type === 'directory'" :node-data="node" :level="0" />
+         <FileItem v-if="node.type === 'file'" :node-data="node" :level="0" />
       </div>
 
-      <DirectoryModal v-model:open="isDirectoryModalOpen" />
-      <FileModal v-model:open="isFileModalOpen" />
+      <DirectoryModal
+         :data="modalStore.directoryModal.data"
+         :type="modalStore.directoryModal.actionType"
+         v-model:open="modalStore.directoryModal.isOpen"
+      />
+      <FileModal
+         :data="modalStore.fileModal.data"
+         :type="modalStore.fileModal.actionType"
+         v-model:open="modalStore.fileModal.isOpen"
+      />
    </div>
 </template>

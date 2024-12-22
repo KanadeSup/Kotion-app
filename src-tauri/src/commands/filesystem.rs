@@ -18,6 +18,7 @@ pub struct FileEntry {
    type_: FileSystemType,
    name: String,
    extension: String,
+   parent_directory: String,
    absolute_path: String,
    full_name: String,
 }
@@ -28,6 +29,7 @@ pub struct DirectoryEntry {
    type_: FileSystemType,
    name: String,
    absolute_path: String,
+   parent_directory: String,
    children: Option<Vec<FileSystemEntry>>,
 }
 
@@ -105,6 +107,7 @@ fn list_vault_files(vault_path: &str) -> Option<Vec<FileSystemEntry>> {
          let entry = DirectoryEntry {
             type_: FileSystemType::Directory,
             name,
+            parent_directory: vault_path.to_string(),
             absolute_path,
             children,
          };
@@ -119,6 +122,7 @@ fn list_vault_files(vault_path: &str) -> Option<Vec<FileSystemEntry>> {
          let entry = FileEntry {
             type_: FileSystemType::File,
             name: name.clone(),
+            parent_directory: vault_path.to_string(),
             absolute_path,
             extension: "json".to_string(),
             full_name: format!("{}.{}", name, "json"),
