@@ -40,13 +40,17 @@ const contextItem = [
 </script>
 
 <template>
-   <ItemContext :items="contextItem">
-      <div
-         :class="cn(buttonVariants({ variant: 'ghost' }), 'w-full h-auto  px-1 py-1 justify-start')"
-         :style="{ paddingLeft: `${level * 10 + 3}px` }"
-      >
-         <IconFile class="w-5 h-5 stroke-gray-300" />
-         <span class="text-sm"> {{ nodeData.name }} </span>
-      </div>
-   </ItemContext>
+   <NuxtLink :to="`/file/${nodeData.id}`">
+      <ItemContext :items="contextItem">
+         <div
+            :class="
+               cn(buttonVariants({ variant: 'ghost' }), 'w-full h-auto  px-1 py-1 justify-start')
+            "
+            :style="{ paddingLeft: `${level * 10 + 3}px` }"
+         >
+            <IconFile class="w-5 h-5 stroke-gray-300" />
+            <span class="text-sm"> {{ nodeData.name }} </span>
+         </div>
+      </ItemContext>
+   </NuxtLink>
 </template>

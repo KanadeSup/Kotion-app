@@ -40,9 +40,10 @@ export async function createFile(path: string, name: string) {
    const res = (await invoke("create_entry_command", {
       filePath: newNodePath,
       isDir: false,
-   })) as CommandResposne<null>;
+   })) as CommandResposne<null | number>;
    if (res.ok) {
-      const fileData : File = {
+      const fileData: File = {
+         id: res.data!,
          type: "file",
          name: name,
          parentDirectory: path,
@@ -55,7 +56,7 @@ export async function createFile(path: string, name: string) {
          data: fileData,
       };
    }
-   return res;
+   return res as CommandResposne<null>;
 }
 
 export async function createDirectory(path: string, name: string) {
@@ -63,9 +64,10 @@ export async function createDirectory(path: string, name: string) {
    const res = (await invoke("create_entry_command", {
       filePath: newNodePath,
       isDir: true,
-   })) as CommandResposne<null>;
+   })) as CommandResposne<null | number>;
    if (res.ok) {
       const directoryData: Directory = {
+         id: res.data!,
          type: "directory",
          name: name,
          parentDirectory: path,
@@ -76,7 +78,8 @@ export async function createDirectory(path: string, name: string) {
          ...res,
          data: directoryData,
       } as CommandResposne<Directory>;
-   } else return res;
+   }
+   return res as CommandResposne<null>;
 }
 
 export async function deleteEntry(path: string) {

@@ -1,6 +1,6 @@
 use crate::store::config_store::ConfigStore;
 use serde::{Serialize, Serializer};
-use std::{fs, path::Path};
+use std::{fs, os::unix::fs::MetadataExt, path::Path};
 use tauri::AppHandle;
 
 use super::CommandResult;
@@ -15,6 +15,7 @@ pub enum FileSystemType {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FileEntry {
+   id: u64,
    type_: FileSystemType,
    name: String,
    extension: String,
@@ -26,6 +27,7 @@ pub struct FileEntry {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DirectoryEntry {
+   id: u64,
    type_: FileSystemType,
    name: String,
    absolute_path: String,
@@ -41,12 +43,12 @@ pub enum FileSystemEntry {
 impl Serialize for FileSystemEntry {
    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
    where
-       S: Serializer,
+      S: Serializer,
    {
-       match self {
-           FileSystemEntry::File(file_entry) => file_entry.serialize(serializer),
-           FileSystemEntry::Directory(directory_entry) => directory_entry.serialize(serializer),
-       }
+      match self {
+         FileSystemEntry::File(file_entry) => file_entry.serialize(serializer),
+         FileSystemEntry::Directory(directory_entry) => directory_entry.serialize(serializer),
+      }
    }
 }
 
@@ -100,11 +102,13 @@ fn list_vault_files(vault_path: &str) -> Option<Vec<FileSystemEntry>> {
       let absolute_path = path.to_str().unwrap().to_string();
       let is_dir = path.is_dir();
       let children = list_vault_files(&absolute_path);
+      let inode_number = fs::metadata(&path).unwrap().ino();
       if is_dir {
          if name.starts_with(".") {
             continue;
          }
          let entry = DirectoryEntry {
+            id: inode_number,
             type_: FileSystemType::Directory,
             name,
             parent_directory: vault_path.to_string(),
@@ -120,6 +124,7 @@ fn list_vault_files(vault_path: &str) -> Option<Vec<FileSystemEntry>> {
             continue;
          }
          let entry = FileEntry {
+            id: inode_number,
             type_: FileSystemType::File,
             name: name.clone(),
             parent_directory: vault_path.to_string(),
@@ -154,20 +159,23 @@ pub fn save_file_content_command(file_path: &str, content: &str) -> CommandResul
 }
 
 #[tauri::command]
-pub fn create_entry_command(file_path: &str, is_dir: bool) -> CommandResult<()> {
+pub fn create_entry_command(file_path: &str, is_dir: bool) -> CommandResult<Option<u64>> {
    let result = if is_dir {
       fs::create_dir_all(file_path)
    } else {
       fs::File::create(file_path).map(|_| ())
    };
    match result {
-      Ok(_) => CommandResult {
-         data: (),
-         ok: true,
-         message: None,
-      },
+      Ok(_) => {
+         let inode_number = fs::metadata(file_path).unwrap().ino();
+         CommandResult {
+            data: Some(inode_number),
+            ok: true,
+            message: None,
+         }
+      }
       Err(e) => CommandResult {
-         data: (),
+         data: None,
          ok: false,
          message: Some(e.to_string()),
       },

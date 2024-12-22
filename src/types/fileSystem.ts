@@ -1,4 +1,5 @@
 type BaseFileSystem = {
+   id: number,
    parentDirectory: string,
    absolutePath: string;
    name: string;

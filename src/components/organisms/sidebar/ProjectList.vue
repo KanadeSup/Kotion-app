@@ -41,7 +41,7 @@ onMounted(async () => {
       <div
          v-if="fileSystemStore.data"
          v-for="node in fileSystemStore.data"
-         :key="node.absolutePath"
+         :key="node.id"
       >
          <DirectoryItem v-if="node.type === 'directory'" :node-data="node" :level="0" />
          <FileItem v-if="node.type === 'file'" :node-data="node" :level="0" />
