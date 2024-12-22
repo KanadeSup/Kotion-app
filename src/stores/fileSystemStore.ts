@@ -148,7 +148,7 @@ function insertEntryToFileSystem(
 
 function isEntryExisted(entry: FileSystemNode, fileSystemNodes: FileSystemNode[]) {
    for (const node of fileSystemNodes) {
-      if (node.name === entry.name) return true;
+      if (node.name === entry.name && node.type == entry.type) return true;
    }
    return false;
 }

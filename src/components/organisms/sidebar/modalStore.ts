@@ -10,7 +10,7 @@ type modalState = {
    },
    fileModal: {
       isOpen: boolean,
-      data: null | File,
+      data: null | File | Directory,
       actionType: "Create" | "Update"
    },
 }
@@ -31,7 +31,7 @@ export const useModalStore = defineStore("modalStore", {
    actions: {
       openModal(modalType: "file" | "directory", actionType: "Create" | "Update", data: FileSystemNode | null) {
          if(modalType === "file") {
-            if(data !== null && data.type === "directory") throw Error("Provided data should be File")
+            if(actionType == "Update" && data !== null && data.type === "directory") throw Error("Provided data should be File")
             this.directoryModal.isOpen = false
             this.fileModal = {
                isOpen: true,

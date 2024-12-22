@@ -116,7 +116,7 @@ fn list_vault_files(vault_path: &str) -> Option<Vec<FileSystemEntry>> {
          let file_extension = path
             .extension()
             .and_then(|ext| Some(ext.to_str().unwrap().to_string()));
-         if file_extension == None || file_extension == Some("json".to_string()) {
+         if file_extension == None || file_extension != Some("json".to_string()) {
             continue;
          }
          let entry = FileEntry {
