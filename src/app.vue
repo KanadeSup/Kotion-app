@@ -2,7 +2,11 @@
 import Setup from "./components/organisms/setup/Setup.vue";
 const configStore = useConfigStore();
 onMounted(async () => {
-  await configStore.fetchVaultPath();
+   await configStore.fetchVaultPath();
+   const isSuccess = await useFileSystemStore().fetch();
+   if (!isSuccess) {
+      console.error(`File System fetched failed on <ProjectList>`);
+   }
 });
 </script>
 <template>

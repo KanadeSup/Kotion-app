@@ -96,6 +96,25 @@ export const useFileSystemStore = defineStore("fileSystemStore", {
             this.fetch();
          }
       },
+      getFileEntryById(id: number, fileSystem: FileSystemNode[] | null = null): File | null {
+         if (fileSystem === null && this.data === null) {
+            return null;
+         }
+         
+         if(fileSystem === null) {
+            fileSystem = this.data;
+         }
+         if (fileSystem === null) return null;
+         for (const node of fileSystem) {
+            if (node.type == "directory") {
+               const entry = this.getFileEntryById(id, node.children);
+               if (entry !== null) return entry;
+               continue;
+            }
+            if (node.id == id) return node;
+         }
+         return null;
+      },
    },
 });
 

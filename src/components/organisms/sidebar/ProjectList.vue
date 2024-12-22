@@ -18,12 +18,6 @@ function openFileModal(actionType: "Create" | "Update") {
    modalStore.openModal("file", actionType, null);
 }
 
-onMounted(async () => {
-   const isSuccess = await fileSystemStore.fetch();
-   if (!isSuccess) {
-      console.error(`File System fetched failed on <ProjectList>`);
-   }
-});
 </script>
 
 <template>

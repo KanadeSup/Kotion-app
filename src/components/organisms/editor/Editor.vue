@@ -6,14 +6,21 @@
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 
+const props = defineProps({
+   content: {
+      type: String,
+      Required: true
+   }
+})
 const editor = useEditor({
-   content: "<p>I’m running Tiptap with Vue.js. 🎉</p>",
+   content: props.content,
    extensions: [StarterKit],
    editorProps: {
       attributes: {
          class: "border-none focus:outline-none p-3 prose prose-gray prose-base prose-invert"
       }
-   }
+   },
+   autofocus: true,
 });
 </script>
 

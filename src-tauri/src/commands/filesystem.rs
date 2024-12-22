@@ -1,6 +1,6 @@
 use crate::store::config_store::ConfigStore;
 use serde::{Serialize, Serializer};
-use std::{fs, os::unix::fs::MetadataExt, path::Path};
+use std::{fs::{self, Metadata}, os::unix::fs::MetadataExt, path::Path};
 use tauri::AppHandle;
 
 use super::CommandResult;
@@ -139,10 +139,18 @@ fn list_vault_files(vault_path: &str) -> Option<Vec<FileSystemEntry>> {
 }
 
 #[tauri::command]
-pub fn get_file_content_command(file_path: &str) -> CommandResult<String> {
+pub fn get_file_content_command(file_path: &str) -> CommandResult<Option<String>> {
+   let file_path = Path::new(file_path);
+   if !file_path.exists() && file_path.is_dir() {
+      return CommandResult {
+         data: None,
+         ok: false,
+         message: Some("File is not existed".to_string()),
+      }
+   }
    let content = fs::read_to_string(file_path).unwrap();
    CommandResult {
-      data: content,
+      data: Some(content),
       ok: true,
       message: None,
    }

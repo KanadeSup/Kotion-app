@@ -23,9 +23,11 @@ export async function getFileSystemNodes() {
 }
 
 export async function getFileContent(path: string) {
-   return (await invoke("get_file_content_command", {
+   const res = (await invoke("get_file_content_command", {
       filePath: path,
-   })) as CommandResposne<string>;
+   })) as CommandResposne<string | null>;
+   if(res.ok) return res as CommandResposne<string>;
+   return res as CommandResposne<null>
 }
 
 export async function saveFileContent(path: string, content: string) {

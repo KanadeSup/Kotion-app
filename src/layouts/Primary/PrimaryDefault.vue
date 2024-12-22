@@ -11,8 +11,10 @@ const sideBarStore = useSideBarStore();
          <Sidebar />
       </template>
       <template v-slot:second>
-         <TitleBar />
-         <slot />
+         <div class="flex flex-col h-full">
+            <TitleBar />
+            <slot />
+         </div>
       </template>
    </Splitter>
 </template>
