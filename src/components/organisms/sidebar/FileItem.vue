@@ -19,6 +19,8 @@ const props = defineProps({
 
 const fileSystemStore = useFileSystemStore();
 const modalStore = useModalStore();
+const route = useRoute()
+const isActive = (path: string) => path == route.path
 const contextItem = [
    {
       name: "Edit file",
@@ -44,7 +46,7 @@ const contextItem = [
       <ItemContext :items="contextItem">
          <div
             :class="
-               cn(buttonVariants({ variant: 'ghost' }), 'w-full h-auto  px-1 py-1 justify-start')
+               cn(buttonVariants({ variant: 'ghost' }), 'w-full h-auto  px-1 py-1 justify-start', isActive(`/file/${nodeData.id}`) ? 'bg-accent' : '')
             "
             :style="{ paddingLeft: `${level * 10 + 3}px` }"
          >
