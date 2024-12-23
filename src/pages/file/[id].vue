@@ -6,6 +6,8 @@
       <div
          v-if="content !== null && content.data !== null && fileData !== null"
          class="h-full cursor-text"
+         id="editorContainer"
+         @click="handleContainerClick"
       >
          <TextEditor
             :content="content.data"
@@ -67,6 +69,14 @@ const throttleSaveContent = _.throttle(async (editor) => {
 function onEditorChange(editor: Editor) {
    isSaved = false;
    throttleSaveContent(editor);
+}
+function handleContainerClick(event: MouseEvent) {
+   const target = event.target as HTMLElement;
+   const currentTarget = event.currentTarget as HTMLElement;
+   if (target !== currentTarget) return;
+   const editor = editorRef.value?.editor;
+   if (!editor) return;
+   editor.commands.focus("end");
 }
 onUnmounted(async () => {
    if (isSaved == true) return;
