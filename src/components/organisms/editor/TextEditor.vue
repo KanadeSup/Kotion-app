@@ -1,7 +1,5 @@
 <template>
-   <div>
-      <editor-content :editor="editor" />
-   </div>
+   <editor-content :editor="editor" />
 </template>
 
 <script setup lang="ts">
@@ -9,9 +7,7 @@ import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import type { PropType } from "vue";
 import type { File } from "~/types/fileSystem";
-import _ from "lodash";
-import { saveFileContent } from "~/api/fileSystem";
-
+import { Editor } from '@tiptap/core'
 const props = defineProps({
    content: {
       type: String,
@@ -21,12 +17,11 @@ const props = defineProps({
       type: Object as PropType<File>,
       required: true,
    },
+   onUpdated: {
+      type: Function as PropType<(editor: Editor)=>{}>,
+      required: false,
+   }
 });
-let isSaved = true;
-const throttleSaveContent = _.throttle(async (editor) => {
-   await saveFileContent(props.fileData.absolutePath, JSON.stringify(editor.getJSON()));
-   isSaved = false;
-}, 500);
 const editor = useEditor({
    content: props.content === "" ? "" : JSON.parse(props.content),
    extensions: [StarterKit],
@@ -37,18 +32,19 @@ const editor = useEditor({
    },
    autofocus: true,
    onUpdate: ({ editor }) => {
-      isSaved = false;
-      throttleSaveContent(editor);
-   },
-});
-onUnmounted(async ()=> {
-   if(isSaved == true) return
-   if(editor.value){
-      await saveFileContent(props.fileData.absolutePath, JSON.stringify(editor.value.getJSON()));
+      if(props.onUpdated) {
+         props.onUpdated(editor)
+      }
    }
-})
-onMounted(()=>{
-})
+});
+function getJsonContent() {
+   if (!editor.value) {
+      console.error("Editor is not defined!");
+      return null;
+   }
+   return editor.value.getJSON();
+}
+defineExpose({ getJsonContent });
 </script>
 
 <style>
