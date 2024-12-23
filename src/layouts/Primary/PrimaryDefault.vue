@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Splitter from "~/components/atoms/Splitter.vue";
 import Sidebar from "~/components/organisms/sidebar/Sidebar.vue";
-import TitleBar from "./TitleBar.vue";
 const sideBarStore = useSideBarStore();
 </script>
 
@@ -11,10 +10,7 @@ const sideBarStore = useSideBarStore();
          <Sidebar />
       </template>
       <template v-slot:second>
-         <div class="flex flex-col h-full">
-            <TitleBar />
-            <slot />
-         </div>
+         <slot />
       </template>
    </Splitter>
 </template>

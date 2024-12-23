@@ -1,14 +1,24 @@
 <template>
-   <div v-if="content !== null && content.data !== null && fileData !== null">
-      <TextEditor :content="content.data" :file-data="fileData" ref="editorRef" :onUpdated="throttleSaveContent"/>
-   </div>
-   <div v-else class="h-full w-full flex items-center justify-center">
-      <div class="flex justify-center flex-col items-center border p-5 px-10 rounded-md">
-         <h1 class="text-2xl font-bold mb-1">Oops !!!</h1>
-         <p v-if="content == null" class="text-gray-400 font-medium">
-            Somthing went wrong, please try again
-         </p>
-         <p v-else class="text-gray-400 font-medium">{{ content.message }}</p>
+   <div>
+      <TitleBar>
+         {{ fileData?.name }}
+      </TitleBar>
+      <div v-if="content !== null && content.data !== null && fileData !== null">
+         <TextEditor
+            :content="content.data"
+            :file-data="fileData"
+            ref="editorRef"
+            :onUpdated="throttleSaveContent"
+         />
+      </div>
+      <div v-else class="h-full w-full flex items-center justify-center">
+         <div class="flex justify-center flex-col items-center border p-5 px-10 rounded-md">
+            <h1 class="text-2xl font-bold mb-1">Oops !!!</h1>
+            <p v-if="content == null" class="text-gray-400 font-medium">
+               Somthing went wrong, please try again
+            </p>
+            <p v-else class="text-gray-400 font-medium">{{ content.message }}</p>
+         </div>
       </div>
    </div>
 </template>
@@ -19,6 +29,7 @@ import { getFileContent, saveFileContent } from "~/api/fileSystem";
 import TextEditor from "~/components/organisms/editor/TextEditor.vue";
 import type { File } from "~/types/fileSystem";
 import _ from "lodash";
+import TitleBar from "~/components/organisms/titlebar/TitleBar.vue";
 
 const route = useRoute();
 const fileSystemStore = useFileSystemStore();
@@ -58,7 +69,7 @@ onUnmounted(async () => {
    if (isSaved == true) return;
    if (editorRef.value) {
       const jsonContent = editorRef.value.getJsonContent();
-      if (jsonContent && fileData.value){
+      if (jsonContent && fileData.value) {
          await saveFileContent(fileData.value.absolutePath, JSON.stringify(jsonContent));
       }
    }
