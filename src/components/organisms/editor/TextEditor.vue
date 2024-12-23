@@ -18,7 +18,7 @@ const props = defineProps({
       required: true,
    },
    onUpdated: {
-      type: Function as PropType<(editor: Editor)=>{}>,
+      type: Function as PropType<(editor: Editor) => void>,
       required: false,
    }
 });
@@ -30,7 +30,6 @@ const editor = useEditor({
          class: "focus:outline-none p-3 prose prose-gray prose-base prose-invert",
       },
    },
-   autofocus: true,
    onUpdate: ({ editor }) => {
       if(props.onUpdated) {
          props.onUpdated(editor)
@@ -44,7 +43,12 @@ function getJsonContent() {
    }
    return editor.value.getJSON();
 }
-defineExpose({ getJsonContent });
+onMounted(()=> {
+   if(editor.value) {
+      editor.value.commands.focus("end")
+   }
+})
+defineExpose({ getJsonContent, editor });
 </script>
 
 <style>

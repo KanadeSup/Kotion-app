@@ -1,14 +1,17 @@
 <template>
-   <div>
+   <div class="flex flex-col h-full">
       <TitleBar>
          {{ fileData?.name }}
       </TitleBar>
-      <div v-if="content !== null && content.data !== null && fileData !== null">
+      <div
+         v-if="content !== null && content.data !== null && fileData !== null"
+         class="h-full cursor-text"
+      >
          <TextEditor
             :content="content.data"
             :file-data="fileData"
             ref="editorRef"
-            :onUpdated="throttleSaveContent"
+            :onUpdated="onEditorChange"
          />
       </div>
       <div v-else class="h-full w-full flex items-center justify-center">
@@ -24,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Editor } from "@tiptap/vue-3";
+import type { Editor } from "@tiptap/core";
 import { getFileContent, saveFileContent } from "~/api/fileSystem";
 import TextEditor from "~/components/organisms/editor/TextEditor.vue";
 import type { File } from "~/types/fileSystem";
