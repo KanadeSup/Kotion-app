@@ -1,6 +1,6 @@
 <template>
-   <div v-if="content !== null && content.data !== null">
-      <Editor :content="content.data" />
+   <div v-if="content !== null && content.data !== null && fileData !== null">
+      <Editor :content="content.data" :file-data="fileData"/>
    </div>
    <div v-else class="h-full w-full flex items-center justify-center">
       <div class="flex justify-center flex-col items-center border p-5 px-10 rounded-md">
@@ -16,8 +16,12 @@
 <script setup lang="ts">
 import { getFileContent } from "~/api/fileSystem";
 import Editor from "~/components/organisms/editor/Editor.vue";
+import type { File } from "~/types/fileSystem";
+
 const route = useRoute();
 const fileSystemStore = useFileSystemStore();
+const fileData = ref<File | null>(null)
+
 const { data: content } = await useAsyncData("fileContentFetch", async () => {
    const idParam = route.params.id;
    if (typeof idParam !== "string") {
@@ -27,7 +31,7 @@ const { data: content } = await useAsyncData("fileContentFetch", async () => {
    if (!fileEntry) {
       return { ok: false, data: null, message: "file is not found" };
    }
-
+   fileData.value = fileEntry;
    const res = await getFileContent(fileEntry.absolutePath);
    return res.ok && res.data !== null
       ? { ok: true, data: res.data, message: null }

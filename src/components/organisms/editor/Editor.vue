@@ -1,30 +1,60 @@
 <template>
-   <editor-content :editor="editor" class="border-none" />
+   <div>
+      <editor-content :editor="editor" />
+   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
+import type { PropType } from "vue";
+import type { File } from "~/types/fileSystem";
+import _ from "lodash";
+import { saveFileContent } from "~/api/fileSystem";
 
 const props = defineProps({
    content: {
       type: String,
-      Required: true
-   }
-})
+      required: true,
+   },
+   fileData: {
+      type: Object as PropType<File>,
+      required: true,
+   },
+});
+let isSaved = true;
+const throttleSaveContent = _.throttle(async (editor) => {
+   await saveFileContent(props.fileData.absolutePath, JSON.stringify(editor.getJSON()));
+   isSaved = false;
+}, 500);
 const editor = useEditor({
-   content: props.content,
+   content: props.content === "" ? "" : JSON.parse(props.content),
    extensions: [StarterKit],
    editorProps: {
       attributes: {
-         class: "border-none focus:outline-none p-3 prose prose-gray prose-base prose-invert"
-      }
+         class: "focus:outline-none p-3 prose prose-gray prose-base prose-invert",
+      },
    },
    autofocus: true,
+   onUpdate: ({ editor }) => {
+      isSaved = false;
+      throttleSaveContent(editor);
+   },
 });
+onUnmounted(async ()=> {
+   if(isSaved == true) return
+   if(editor.value){
+      await saveFileContent(props.fileData.absolutePath, JSON.stringify(editor.value.getJSON()));
+   }
+})
+onMounted(()=>{
+})
 </script>
 
 <style>
+.tiptap {
+   margin: 0px 0px 0px 0px !important;
+}
 .tiptap h1 {
    font-size: 28px;
    margin: 10px 0px 10px 0px;
