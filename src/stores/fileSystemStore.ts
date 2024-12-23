@@ -100,8 +100,8 @@ export const useFileSystemStore = defineStore("fileSystemStore", {
          if (fileSystem === null && this.data === null) {
             return null;
          }
-         
-         if(fileSystem === null) {
+
+         if (fileSystem === null) {
             fileSystem = this.data;
          }
          if (fileSystem === null) return null;
@@ -174,6 +174,7 @@ function isEntryExisted(entry: FileSystemNode, fileSystemNodes: FileSystemNode[]
 
 function fileSystemSort(fileSystem: FileSystemNode[], isDeepSort: boolean) {
    fileSystem.sort((a, b) => {
+      if (a.type === "directory") return -1;
       if (a.name > b.name) return 1;
       if (a.name < b.name) return -1;
       return 0;
