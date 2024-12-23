@@ -49,7 +49,7 @@ defineExpose({ getJsonContent });
 
 <style>
 .tiptap {
-   margin: 0px 0px 0px 0px !important;
+   max-width: none
 }
 .tiptap h1 {
    font-size: 28px;
@@ -76,6 +76,7 @@ defineExpose({ getJsonContent });
    font-weight: 500;
    color: #ececec;
    margin: 0;
+   word-break: break-all;
 }
 .tiptap ul {
    margin: 0;
