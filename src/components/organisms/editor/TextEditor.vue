@@ -7,7 +7,10 @@ import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import type { PropType } from "vue";
 import type { File } from "~/types/fileSystem";
-import { Editor } from '@tiptap/core'
+import { Editor } from "@tiptap/core";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { all, createLowlight } from "lowlight";
+import '~/assets/css/editor.css'
 const props = defineProps({
    content: {
       type: String,
@@ -20,21 +23,27 @@ const props = defineProps({
    onUpdated: {
       type: Function as PropType<(editor: Editor) => void>,
       required: false,
-   }
+   },
 });
+const lowlight = createLowlight(all);
 const editor = useEditor({
    content: props.content === "" ? "" : JSON.parse(props.content),
-   extensions: [StarterKit],
+   extensions: [
+      StarterKit,
+      CodeBlockLowlight.configure({
+         lowlight,
+      }),
+   ],
    editorProps: {
       attributes: {
          class: "focus:outline-none p-3 prose prose-gray prose-base prose-invert",
       },
    },
    onUpdate: ({ editor }) => {
-      if(props.onUpdated) {
-         props.onUpdated(editor)
+      if (props.onUpdated) {
+         props.onUpdated(editor);
       }
-   }
+   },
 });
 function getJsonContent() {
    if (!editor.value) {
@@ -43,17 +52,17 @@ function getJsonContent() {
    }
    return editor.value.getJSON();
 }
-onMounted(()=> {
-   if(editor.value) {
-      editor.value.commands.focus("end")
+onMounted(() => {
+   if (editor.value) {
+      editor.value.commands.focus("end");
    }
-})
+});
 defineExpose({ getJsonContent, editor });
 </script>
 
 <style>
 .tiptap {
-   max-width: none
+   max-width: none;
 }
 .tiptap h1 {
    font-size: 28px;
