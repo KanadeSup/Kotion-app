@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconLayoutSidebar } from '@tabler/icons-vue';
 const props = defineProps({
    class: {
       type: String,

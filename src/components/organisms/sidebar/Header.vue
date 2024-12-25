@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { IconArrowsExchange, IconBrandApple, IconSelector, IconSettings } from '@tabler/icons-vue';
+import { useSettingStore } from '~/components/organisms/setting/settingStore';
+
+const settingStore = useSettingStore();
 const dropDownItem = [
    {
       name: "Setting",
       icon: IconSettings,
       click: () => {
-         console.log("Setting");
+         settingStore.openModal()
       }
    },
    {

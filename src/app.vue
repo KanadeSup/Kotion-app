@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import Setting from "./components/organisms/setting/Setting.vue";
 import Setup from "./components/organisms/setup/Setup.vue";
 const configStore = useConfigStore();
 onMounted(async () => {
-   await configStore.fetchVaultPath();
-   const isSuccess = await useFileSystemStore().fetch();
-   if (!isSuccess) {
+   let isFetchSuccess = await configStore.fetchVaultPath();
+   if(!isFetchSuccess) return;
+   isFetchSuccess = await useFileSystemStore().fetch();
+   if (!isFetchSuccess) {
       console.error(`File System fetched failed on <ProjectList>`);
    }
 });
@@ -15,5 +17,8 @@ onMounted(async () => {
          <NuxtPage />
       </NuxtLayout>
       <Setup v-if="configStore.vaultPath == null" />
+      
+      <!-- Global component -->
+      <Setting />
    </div>
 </template>
