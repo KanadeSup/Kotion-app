@@ -21,9 +21,9 @@ function openFileModal(actionType: "Create" | "Update") {
 </script>
 
 <template>
-   <div class="px-1 py-3">
+   <div class="px-1 mt-2">
       <div class="flex pl-1 mb-2 items-center">
-         <h1>Project</h1>
+         <h1 class="text-sm text-gray-300">Project</h1>
          <ProjectPopover
             class="p-1 rounded hover:bg-accent cursor-pointer ml-auto"
             @open-directory-modal="openDirectoryModal"
