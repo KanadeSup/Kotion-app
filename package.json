@@ -39,6 +39,7 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vue": "latest",
+    "vue-draggable-plus": "^0.6.0",
     "vue-router": "latest"
   },
   "devDependencies": {

@@ -1,3 +1,8 @@
+<script setup lang="ts">
+import Gallery from '~/components/organisms/gallery/Gallery.vue';
+
+</script>
+
 <template>
-   This is the home page
+   <Gallery />
 </template>
