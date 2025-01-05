@@ -1,5 +1,5 @@
 <template>
-   <div>
+   <div class="h-full w-full">
       <div v-if="content !== null && content.data !== null && fileData !== null">
          <NoteEditor
             v-if="typeof content.data == 'string' || content.data.type == 'NOTE'"
@@ -8,6 +8,8 @@
          />
          <Gallery
             v-else-if="typeof content.data !== 'string' && content.data.type == 'GALLERY'"
+            :data="content.data.content"
+            :file-data="fileData"
          />
       </div>
       <div v-else class="h-full w-full flex items-center justify-center">

@@ -205,7 +205,10 @@ function fileSystemSort(fileSystem: FileSystemNode[], isDeepSort: boolean) {
 function createEmptyGalleryJson() {
    const galleryJson: GalleryFileContent = {
       type: "GALLERY",
-      content: {},
+      content: {
+         items: [],
+         setting: {}
+      },
    };
    return JSON.stringify(galleryJson);
 }

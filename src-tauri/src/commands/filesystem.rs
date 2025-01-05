@@ -1,6 +1,10 @@
 use crate::store::config_store::ConfigStore;
 use serde::{Serialize, Serializer};
-use std::{fs::{self, Metadata}, os::unix::fs::MetadataExt, path::Path};
+use std::{
+   fs::{self, Metadata},
+   os::unix::fs::MetadataExt,
+   path::Path,
+};
 use tauri::AppHandle;
 
 use super::CommandResult;
@@ -146,7 +150,7 @@ pub fn get_file_content_command(file_path: &str) -> CommandResult<Option<String>
          data: None,
          ok: false,
          message: Some("File is not existed".to_string()),
-      }
+      };
    }
    let content = fs::read_to_string(file_path).unwrap();
    CommandResult {
@@ -167,7 +171,21 @@ pub fn save_file_content_command(file_path: &str, content: &str) -> CommandResul
 }
 
 #[tauri::command]
-pub fn create_entry_command(file_path: &str, is_dir: bool, content: Option<&str>) -> CommandResult<Option<u64>> {
+pub fn save_file_binary(file_path: &str, data: Vec<u8>) -> CommandResult<&str> {
+   fs::write(file_path, data).unwrap();
+   CommandResult {
+      data: file_path,
+      ok: true,
+      message: None,
+   }
+}
+
+#[tauri::command]
+pub fn create_entry_command(
+   file_path: &str,
+   is_dir: bool,
+   content: Option<&str>,
+) -> CommandResult<Option<u64>> {
    let result = if is_dir {
       fs::create_dir_all(file_path)
    } else {

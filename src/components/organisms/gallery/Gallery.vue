@@ -1,30 +1,48 @@
 <template>
-   <div class="overflow-auto h-full">
-      <Header />
-      <VueDraggable
-         :animation="50"
-         ghostClass="ghost"
-         v-model="list"
-         class="px-5 py-5 grid 2xl:grid-cols-6 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-5"
-      >
-         <GalleryCard v-for="item in list" :key="item.id" :name="item.name" :url="item.url"/>
-      </VueDraggable>
+   <div>
+      <div class="overflow-auto h-full" v-if="!galleryStore.isEditPageOpen">
+         <Header />
+         <VueDraggable
+            :animation="50"
+            ghostClass="ghost"
+            v-model="data.items"
+            class="px-5 py-5 grid 2xl:grid-cols-6 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-5"
+         >
+            <GalleryCard
+               v-for="item in data.items"
+               :key="item.id"
+               :data="item"
+               @click="galleryStore.openUpdatePage(item.id)"
+            />
+         </VueDraggable>
+      </div>
+      <div v-else>
+         <GalleryItemDetail />
+      </div>
    </div>
 </template>
 <script setup lang="ts">
+import type { PropType } from "vue";
 import GalleryCard from "./GalleryCard.vue";
 import Header from "./Header.vue";
 import { VueDraggable } from "vue-draggable-plus";
+import type { File, GalleryJson } from "~/types/fileSystem";
+import GalleryItemDetail from "./GalleryItemDetail.vue";
 
-const list = ref([
-   { id: 1, name: "a", url:"/galleries/123/items/1" },
-   { id: 2, name: "b", url:"/galleries/123/items/1" },
-   { id: 3, name: "c", url:"/galleries/123/items/1" },
-   { id: 4, name: "d", url:"/galleries/123/items/1" },
-   { id: 5, name: "e", url:"/galleries/123/items/1" },
-   { id: 6, name: "f", url:"/galleries/123/items/1" },
-   { id: 7, name: "g", url:"/galleries/123/items/1" },
-]);
+const galleryStore = useGalleryStore();
+const props = defineProps({
+   data: {
+      type: Object as PropType<GalleryJson>,
+      required: true,
+   },
+   fileData: {
+      type: Object as PropType<File>,
+      required: true,
+   },
+});
+onMounted(() => {
+   galleryStore.set(props.data, props.fileData);
+});
 </script>
 
 <style>

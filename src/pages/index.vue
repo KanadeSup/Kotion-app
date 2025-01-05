@@ -4,5 +4,4 @@ import Gallery from '~/components/organisms/gallery/Gallery.vue';
 </script>
 
 <template>
-   <Gallery />
 </template>

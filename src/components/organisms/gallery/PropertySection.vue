@@ -1,13 +1,39 @@
 <template>
    <div class="w-full rounded-lg grid grid-cols-6 items-stretch gap-2">
-      <div
-         class="col-span-2 text-muted-foreground hover:bg-accent h-8 px-1 rounded flex items-center cursor-pointer gap-1 text-sm"
-      >
-         <IconH1 class="w-4 h-4" />
-         Title
+      <div class="col-span-2">
+         <div
+            class="text-muted-foreground hover:bg-accent h-8 px-1 rounded flex items-center cursor-pointer gap-1 text-sm"
+         >
+            <IconH1 class="w-4 h-4" />
+            Title
+         </div>
       </div>
-      <Input class="col-span-4 h-auto" />
-      <div v-if="!isAdding" class="col-span-2">
+      <div class="col-span-4">
+         <div
+            class="text-sm flex items-center hover:bg-accent h-8 px-2 rounded cursor-pointer"
+            v-if="editingElement.propertyIndex !== 0 || editingElement.cellType !== 'VALUE'"
+            @click="openEditProperty(0, 'VALUE')"
+         >
+            {{ galleryStore.editItem?.properties[0].value }}
+         </div>
+         <div
+            v-if="editingElement.propertyIndex == 0 && editingElement.cellType == 'VALUE'"
+            class="col-span-4"
+         >
+            <input
+               ref="property-input"
+               class="w-full bg-background border rounded-md px-1 py-1 text-sm focus-visible:outline-none focus-visible:border-gray-400 h-8 text-muted-foreground"
+               @blur="
+                  (event) => {
+                     const target = event.currentTarget as HTMLInputElement | null;
+                     if (!target) return;
+                     finishEditProperty(target.value);
+                  }
+               "
+            />
+         </div>
+      </div>
+      <div v-if="true" class="col-span-2">
          <Popover>
             <PopoverTrigger class="w-full">
                <div
@@ -21,7 +47,6 @@
                <div
                   v-for="item in propertyType"
                   class="flex gap-2 items-center text-sm text-gray-300 hover:bg-accent p-1 rounded-md cursor-pointer"
-                  @click="handleAddPropClick"
                >
                   <component :is="item.icon" class="w-4 h-4" />
                   <p>{{ item.name }}</p>
@@ -31,10 +56,8 @@
       </div>
       <div v-else class="col-span-2">
          <input
-            ref="prop-add-input"
+            ref="property-input"
             class="w-full bg-background border rounded-md px-1 py-1 text-sm focus-visible:outline-none focus-visible:border-gray-400 h-8 text-muted-foreground"
-            @blur="handleAddPropInputBlur"
-            v-model="addPropValue"
          />
       </div>
    </div>
@@ -42,10 +65,20 @@
 
 <script setup lang="ts">
 import { IconAlignLeft, IconH1, IconPlus, IconStar, IconTag } from "@tabler/icons-vue";
+import type { GalleryProperty } from "~/types/fileSystem";
 
-const isAdding = ref(false);
-const addPropValue = ref("");
-const propAddInput = useTemplateRef("prop-add-input");
+const galleryStore = useGalleryStore();
+type EditingElement = {
+   propertyIndex: number | null;
+   cellType: "KEY" | "VALUE" | null;
+   value: null | GalleryProperty;
+};
+const editingElement = ref<EditingElement>({
+   propertyIndex: null,
+   cellType: null,
+   value: null,
+});
+const inputRef = useTemplateRef("property-input");
 const propertyType = [
    {
       name: "Text",
@@ -60,14 +93,46 @@ const propertyType = [
       icon: IconStar,
    },
 ];
-function handleAddPropClick() {
-   isAdding.value = true;
-   addPropValue.value = ""
+function openEditProperty(propertyIndex: number, cellType: "KEY" | "VALUE") {
+   if (!galleryStore.editItem) return;
+   editingElement.value = {
+      propertyIndex,
+      cellType,
+      value: galleryStore.editItem.properties[propertyIndex],
+   };
    nextTick(() => {
-      propAddInput.value?.focus();
+      inputRef.value?.focus();
+      if (!galleryStore.editItem || !inputRef.value) return;
+
+      // This need to be tempoorary handle, need a better way
+      inputRef.value.value = galleryStore.editItem.properties[propertyIndex].value as string;
    });
 }
-function handleAddPropInputBlur() {
-   isAdding.value = false;
+async function finishEditProperty(value: any) {
+   const editProperty = editingElement.value.value;
+   if (
+      !editProperty ||
+      !galleryStore.editItem ||
+      editingElement.value.propertyIndex == null ||
+      !value
+   ) {
+      editingElement.value = {
+         propertyIndex: null,
+         cellType: null,
+         value: null,
+      };
+      return;
+   }
+   editProperty.value = value;
+   const updatedItem = galleryStore.editItem;
+   const updatedProperties = updatedItem.properties;
+   updatedProperties[editingElement.value.propertyIndex] = editProperty;
+   galleryStore.updateItem(updatedItem.id, updatedItem);
+   await galleryStore.save();
+   editingElement.value = {
+      propertyIndex: null,
+      cellType: null,
+      value: null,
+   };
 }
 </script>

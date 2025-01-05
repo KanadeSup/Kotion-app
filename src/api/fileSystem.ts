@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { Directory, File, FileSystemNode } from "@/types/fileSystem";
+import type { Directory, File as FileType, FileSystemNode } from "@/types/fileSystem";
 import type { CommandResposne } from "~/types/api";
 
 export async function setVaultPath(path: string) {
@@ -26,8 +26,8 @@ export async function getFileContent(path: string) {
    const res = (await invoke("get_file_content_command", {
       filePath: path,
    })) as CommandResposne<string | null>;
-   if(res.ok) return res as CommandResposne<string>;
-   return res as CommandResposne<null>
+   if (res.ok) return res as CommandResposne<string>;
+   return res as CommandResposne<null>;
 }
 
 export async function saveFileContent(path: string, content: string) {
@@ -37,15 +37,24 @@ export async function saveFileContent(path: string, content: string) {
    })) as CommandResposne<null>;
 }
 
+// save_file_binary
+export async function saveImage(path: string, data: File) {
+   const buffer = await data.arrayBuffer();
+   return (await invoke("save_file_binary", {
+      filePath: path,
+      data: Array.from(new Uint8Array(buffer)),
+   })) as CommandResposne<string>;
+}
+
 export async function createFile(path: string, name: string, content: null | string) {
    const newNodePath = `${path}/${name}.json`;
    const res = (await invoke("create_entry_command", {
       filePath: newNodePath,
       isDir: false,
-      content: content
+      content: content,
    })) as CommandResposne<null | number>;
    if (res.ok) {
-      const fileData: File = {
+      const fileData: FileType = {
          id: res.data!,
          type: "file",
          name: name,

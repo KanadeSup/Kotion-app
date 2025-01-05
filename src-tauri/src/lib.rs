@@ -27,6 +27,7 @@ pub fn run() {
          commands::filesystem::rename_entry_command,
          commands::filesystem::set_vault_path_command,
          commands::filesystem::get_vault_path_command,
+         commands::filesystem::save_file_binary,
       ])
       .run(tauri::generate_context!())
       .expect("error while running tauri application");

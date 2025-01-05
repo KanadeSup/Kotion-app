@@ -3,7 +3,7 @@
       for="image-input"
       :class="cn('w-2/6 shrink-0 border rounded-lg  cursor-pointer hover:bg-accent', props.class)"
    >
-      <AspectRatio :ratio="12 / 9" class="flex items-center justify-center">
+      <AspectRatio :ratio="13 / 9" class="flex items-center justify-center">
          <IconUpload class="w-9 h-9 text-gray-400" v-if="!imgUrl"/>
          <div v-else class="w-full h-full">
             <img :src="imgUrl" 
@@ -30,7 +30,7 @@ type PROPS = {
 };
 const props = defineProps<PROPS>();
 const model = defineModel("value", {
-   type: Object as PropType<File>,
+   type: Object as PropType<File | null>,
 });
 const imgUrl = ref("")
 
