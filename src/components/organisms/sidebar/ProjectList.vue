@@ -11,13 +11,12 @@ const modalStore = useModalStore();
 const fileSystemStore = useFileSystemStore();
 
 function openDirectoryModal(actionType: "Create" | "Update") {
-   modalStore.openModal("directory", actionType, null);
+   modalStore.openDirectoryModal(actionType, null);
 }
 
-function openFileModal(actionType: "Create" | "Update") {
-   modalStore.openModal("file", actionType, null);
+function openFileModal(actionType: "Create" | "Update", fileType: "NOTE" | "GALLERY") {
+   modalStore.openFileModal(actionType, fileType, null);
 }
-
 </script>
 
 <template>
@@ -32,11 +31,7 @@ function openFileModal(actionType: "Create" | "Update") {
             <IconPlus class="w-4 h-4 stroke-gray-300" />
          </ProjectPopover>
       </div>
-      <div
-         v-if="fileSystemStore.data"
-         v-for="node in fileSystemStore.data"
-         :key="node.id"
-      >
+      <div v-if="fileSystemStore.data" v-for="node in fileSystemStore.data" :key="node.id">
          <DirectoryItem v-if="node.type === 'directory'" :node-data="node" :level="0" />
          <FileItem v-if="node.type === 'file'" :node-data="node" :level="0" />
       </div>
@@ -49,6 +44,7 @@ function openFileModal(actionType: "Create" | "Update") {
       <FileModal
          :data="modalStore.fileModal.data"
          :type="modalStore.fileModal.actionType"
+         :file-type="modalStore.fileModal.fileType"
          v-model:open="modalStore.fileModal.isOpen"
       />
    </div>

@@ -7,13 +7,13 @@ import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import type { PropType } from "vue";
 import type { File } from "~/types/fileSystem";
-import { Editor } from "@tiptap/core";
+import { Editor, type JSONContent } from "@tiptap/core";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
-import '~/assets/css/editor.css'
+import "~/assets/css/editor.css";
 const props = defineProps({
    content: {
-      type: String,
+      type: [String, Object] as PropType<string | JSONContent>,
       required: true,
    },
    fileData: {
@@ -26,10 +26,17 @@ const props = defineProps({
    },
 });
 const lowlight = createLowlight(all);
+let content: string | JSONContent = "";
+
+if (props.content === "") content = "";
+else if (typeof props.content == "object") content = props.content;
+
 const editor = useEditor({
-   content: props.content === "" ? "" : JSON.parse(props.content),
+   content: content,
    extensions: [
-      StarterKit,
+      StarterKit.configure({
+         codeBlock: false,
+      }),
       CodeBlockLowlight.configure({
          lowlight,
       }),

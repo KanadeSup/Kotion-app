@@ -167,7 +167,7 @@ pub fn save_file_content_command(file_path: &str, content: &str) -> CommandResul
 }
 
 #[tauri::command]
-pub fn create_entry_command(file_path: &str, is_dir: bool) -> CommandResult<Option<u64>> {
+pub fn create_entry_command(file_path: &str, is_dir: bool, content: Option<&str>) -> CommandResult<Option<u64>> {
    let result = if is_dir {
       fs::create_dir_all(file_path)
    } else {
@@ -175,6 +175,11 @@ pub fn create_entry_command(file_path: &str, is_dir: bool) -> CommandResult<Opti
    };
    match result {
       Ok(_) => {
+         if is_dir == false {
+            if let Some(value) = content {
+               fs::write(file_path, value).unwrap();
+            }
+         }
          let inode_number = fs::metadata(file_path).unwrap().ino();
          CommandResult {
             data: Some(inode_number),

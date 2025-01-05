@@ -1,19 +1,13 @@
 <template>
-   <div class="flex flex-col h-full">
-      <TitleBar>
-         {{ fileData?.name }}
-      </TitleBar>
-      <div
-         v-if="content !== null && content.data !== null && fileData !== null"
-         class="h-full cursor-text"
-         id="editorContainer"
-         @click="handleContainerClick"
-      >
-         <TextEditor
-            :content="content.data"
+   <div>
+      <div v-if="content !== null && content.data !== null && fileData !== null">
+         <NoteEditor
+            v-if="typeof content.data == 'string' || content.data.type == 'NOTE'"
+            :content="typeof content.data == 'string' ? content.data : content.data.content"
             :file-data="fileData"
-            ref="editorRef"
-            :onUpdated="onEditorChange"
+         />
+         <Gallery
+            v-else-if="typeof content.data !== 'string' && content.data.type == 'GALLERY'"
          />
       </div>
       <div v-else class="h-full w-full flex items-center justify-center">
@@ -29,17 +23,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Editor } from "@tiptap/core";
-import { getFileContent, saveFileContent } from "~/api/fileSystem";
-import TextEditor from "~/components/organisms/editor/TextEditor.vue";
-import type { File } from "~/types/fileSystem";
-import _ from "lodash";
-import TitleBar from "~/components/organisms/titlebar/TitleBar.vue";
+import { getFileContent } from "~/api/fileSystem";
+import type { File, FileContent } from "~/types/fileSystem";
+import NoteEditor from "~/components/organisms/note/NoteEditor.vue";
+import Gallery from "~/components/organisms/gallery/Gallery.vue";
 
 const route = useRoute();
 const fileSystemStore = useFileSystemStore();
 const fileData = ref<File | null>(null);
-const editorRef = ref<InstanceType<typeof TextEditor> | null>(null);
 
 const { data: content } = await useAsyncData("fileContentFetch", async () => {
    const idParam = route.params.id;
@@ -52,39 +43,17 @@ const { data: content } = await useAsyncData("fileContentFetch", async () => {
    }
    fileData.value = fileEntry;
    const res = await getFileContent(fileEntry.absolutePath);
-   return res.ok && res.data !== null
-      ? { ok: true, data: res.data, message: null }
-      : { ok: false, data: null, message: res.message };
-});
-let isSaved = true;
-
-const throttleSaveContent = _.throttle(async (editor) => {
-   if (!fileData.value) {
-      console.error("There is no file data to identify what file contents should be saved");
-      return;
+   if (res.ok && res.data !== null) {
+      let data: string | FileContent = "";
+      try {
+         data = JSON.parse(res.data) as FileContent;
+      } catch (e) {}
+      return {
+         ok: true,
+         data: data,
+         message: null,
+      };
    }
-   await saveFileContent(fileData.value.absolutePath, JSON.stringify(editor.getJSON()));
-   isSaved = false;
-}, 500);
-function onEditorChange(editor: Editor) {
-   isSaved = false;
-   throttleSaveContent(editor);
-}
-function handleContainerClick(event: MouseEvent) {
-   const target = event.target as HTMLElement;
-   const currentTarget = event.currentTarget as HTMLElement;
-   if (target !== currentTarget) return;
-   const editor = editorRef.value?.editor;
-   if (!editor) return;
-   editor.commands.focus("end");
-}
-onUnmounted(async () => {
-   if (isSaved == true) return;
-   if (editorRef.value) {
-      const jsonContent = editorRef.value.getJsonContent();
-      if (jsonContent && fileData.value) {
-         await saveFileContent(fileData.value.absolutePath, JSON.stringify(jsonContent));
-      }
-   }
+   return { ok: false, data: null, message: res.message };
 });
 </script>

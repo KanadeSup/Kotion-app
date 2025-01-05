@@ -37,11 +37,12 @@ export async function saveFileContent(path: string, content: string) {
    })) as CommandResposne<null>;
 }
 
-export async function createFile(path: string, name: string) {
+export async function createFile(path: string, name: string, content: null | string) {
    const newNodePath = `${path}/${name}.json`;
    const res = (await invoke("create_entry_command", {
       filePath: newNodePath,
       isDir: false,
+      content: content
    })) as CommandResposne<null | number>;
    if (res.ok) {
       const fileData: File = {

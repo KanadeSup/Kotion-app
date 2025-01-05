@@ -25,27 +25,34 @@ const props = defineProps({
 });
 const isOpen = ref(false);
 const modalStore = useModalStore();
-const fileSystemStore = useFileSystemStore()
+const fileSystemStore = useFileSystemStore();
 const contexItem = [
    {
       name: "Create directory",
       icon: IconFolderPlus,
       click: () => {
-         modalStore.openModal("directory", "Create", props.nodeData);
+         modalStore.openDirectoryModal("Create", props.nodeData);
       },
    },
    {
       name: "Create note",
       icon: IconFilePlus,
       click: () => {
-         modalStore.openModal("file", "Create", props.nodeData);
+         modalStore.openFileModal("Create", "NOTE", props.nodeData);
+      },
+   },
+   {
+      name: "Create gallery",
+      icon: IconFilePlus,
+      click: () => {
+         modalStore.openFileModal("Create", "GALLERY", props.nodeData);
       },
    },
    {
       name: "Edit directory",
       icon: IconFolderCog,
       click: () => {
-         modalStore.openModal("directory", "Update", props.nodeData);
+         modalStore.openDirectoryModal("Update", props.nodeData);
       },
    },
    {
@@ -54,7 +61,7 @@ const contexItem = [
       class: "text-red-500 font-medium focus:text-red-500",
       iconClass: "stroke-red-500",
       click: async () => {
-         await fileSystemStore.remove(props.nodeData.absolutePath)
+         await fileSystemStore.remove(props.nodeData.absolutePath);
       },
    },
 ];

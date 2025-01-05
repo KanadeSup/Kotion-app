@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { IconFile } from '@tabler/icons-vue';
+import { IconFile } from "@tabler/icons-vue";
 import { VisuallyHidden } from "radix-vue";
-import type { Directory, File } from '~/types/fileSystem';
+import type { Directory, File } from "~/types/fileSystem";
 
 const props = defineProps({
    type: {
@@ -11,8 +11,12 @@ const props = defineProps({
    data: {
       type: Object as PropType<File | Directory | null>,
    },
+   fileType: {
+      type: [String, null] as PropType<"NOTE" | "GALLERY" | null>,
+      required: true,
+   },
 });
-const open = defineModel('open', { type: Boolean, required: true });
+const open = defineModel("open", { type: Boolean, required: true });
 const fileSystemStore = useFileSystemStore();
 const inputData = ref({
    name: "",
@@ -24,7 +28,12 @@ const error = ref({
 
 async function onSubmit() {
    if (props.type === "Create") {
-      const result = await fileSystemStore.add(props.data ? props.data.absolutePath : null, inputData.value.name, false);
+      const result = await fileSystemStore.add(
+         props.data ? props.data.absolutePath : null,
+         inputData.value.name,
+         false,
+         props.fileType,
+      );
       if (!result.isError) {
          open.value = false;
          return;
@@ -36,7 +45,7 @@ async function onSubmit() {
          };
          return;
       }
-      console.error("Create file was failed:", result)
+      console.error("Create file was failed:", result);
       error.value = {
          errorInput: false,
          message: "Something went wrong, please try again",
@@ -45,13 +54,13 @@ async function onSubmit() {
    }
    if (props.type === "Update" && props.data) {
       const result = await fileSystemStore.update(props.data, {
-         name: inputData.value.name
-      })
-      if(!result.isError) {
+         name: inputData.value.name,
+      });
+      if (!result.isError) {
          open.value = false;
-         return
+         return;
       }
-      console.error("update file was failed:", result)
+      console.error("update file was failed:", result);
       error.value = {
          errorInput: false,
          message: "Something went wrong, please try again",
@@ -59,21 +68,20 @@ async function onSubmit() {
    }
 }
 function reset() {
-   inputData.value.name = ""
-   error.value.errorInput = false
-   error.value.message = ""
-
+   inputData.value.name = "";
+   error.value.errorInput = false;
+   error.value.message = "";
 }
-watch(open, ()=>{
-   if(open.value == false) {
-      return
-   }
-   reset()
-   if(props.type !== "Update" || !props.data) {
+watch(open, () => {
+   if (open.value == false) {
       return;
    }
-   inputData.value.name = props.data.name
-})
+   reset();
+   if (props.type !== "Update" || !props.data) {
+      return;
+   }
+   inputData.value.name = props.data.name;
+});
 </script>
 <template>
    <Dialog v-model:open="open">
@@ -87,9 +95,13 @@ watch(open, ()=>{
                class="py-1 h-auto focus-visible:ring-0 rounded-l-none w-[250px] px-2"
                :class="error.errorInput ? 'border-red-500' : ''"
                v-model="inputData.name"
-               @input="error.errorInput = false; error.message = ''"
-            />         </div>
-         <p v-if="error.message !== ''" class="text-red-500 text-xs"> {{ error.message }} </p>
+               @input="
+                  error.errorInput = false;
+                  error.message = '';
+               "
+            />
+         </div>
+         <p v-if="error.message !== ''" class="text-red-500 text-xs">{{ error.message }}</p>
          <div class="w-full mt-2">
             <Button class="w-full font-medium text-sm hover:bg-gray-300" @click="onSubmit">
                <p v-if="type === 'Create'">Create file</p>

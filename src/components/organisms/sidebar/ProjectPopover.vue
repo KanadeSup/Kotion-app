@@ -16,7 +16,12 @@ const dropMenuItem = [
    {
       name: "Create note",
       icon: IconFilePlus,
-      click: () => emit("openFileModal", "Create"),
+      click: () => emit("openFileModal", "Create", "NOTE"),
+   },
+   {
+      name: "Create gallery",
+      icon: IconFilePlus,
+      click: () => emit("openFileModal", "Create", "GALLERY"),
    },
 ];
 </script>

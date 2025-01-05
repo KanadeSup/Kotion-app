@@ -6,7 +6,13 @@ import {
    getFileSystemNodes,
    renameEntry,
 } from "~/api/fileSystem";
-import type { Directory, File, FileSystemNode } from "~/types/fileSystem";
+import type {
+   Directory,
+   File,
+   FileSystemNode,
+   GalleryFileContent,
+   NoteFileContent,
+} from "~/types/fileSystem";
 
 type FileSystemState = {
    data: null | FileSystemNode[];
@@ -37,7 +43,12 @@ export const useFileSystemStore = defineStore("fileSystemStore", {
          }
          return false;
       },
-      async add(dirPath: null | string, name: string, isDir: boolean): Promise<AddActionResult> {
+      async add(
+         dirPath: null | string,
+         name: string,
+         isDir: boolean,
+         type: null | "NOTE" | "GALLERY" = null,
+      ): Promise<AddActionResult> {
          if (this.data === null)
             return {
                isError: true,
@@ -54,7 +65,10 @@ export const useFileSystemStore = defineStore("fileSystemStore", {
          if (isDir) {
             res = await createDirectory(dirPath, name);
          } else {
-            res = await createFile(dirPath, name);
+            let content = null;
+            if (type === "GALLERY") content = createEmptyGalleryJson();
+            if (type === "NOTE") content = createEmptyNoteJson();
+            res = await createFile(dirPath, name, content);
          }
          if (res.data === null) {
             return {
@@ -186,4 +200,20 @@ function fileSystemSort(fileSystem: FileSystemNode[], isDeepSort: boolean) {
          }
       }
    }
+}
+
+function createEmptyGalleryJson() {
+   const galleryJson: GalleryFileContent = {
+      type: "GALLERY",
+      content: {},
+   };
+   return JSON.stringify(galleryJson);
+}
+
+function createEmptyNoteJson() {
+   const galleryJson: NoteFileContent = {
+      type: "NOTE",
+      content: "",
+   };
+   return JSON.stringify(galleryJson);
 }
