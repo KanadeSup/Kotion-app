@@ -1,7 +1,7 @@
 use crate::store::config_store::ConfigStore;
 use serde::{Serialize, Serializer};
 use std::{
-   fs::{self, Metadata},
+   fs,
    os::unix::fs::MetadataExt,
    path::Path,
 };

@@ -6,7 +6,7 @@
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import type { PropType } from "vue";
-import type { File } from "~/types/fileSystem";
+import Placeholder from "@tiptap/extension-placeholder";
 import { Editor, type JSONContent } from "@tiptap/core";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
@@ -16,10 +16,7 @@ const props = defineProps({
       type: [String, Object] as PropType<string | JSONContent>,
       required: true,
    },
-   fileData: {
-      type: Object as PropType<File>,
-      required: true,
-   },
+   placeholder: String,
    onUpdated: {
       type: Function as PropType<(editor: Editor) => void>,
       required: false,
@@ -39,6 +36,9 @@ const editor = useEditor({
       }),
       CodeBlockLowlight.configure({
          lowlight,
+      }),
+      Placeholder.configure({
+         placeholder: props.placeholder ? props.placeholder : "",
       }),
    ],
    editorProps: {
@@ -105,5 +105,12 @@ defineExpose({ getJsonContent, editor });
 .tiptap li {
    margin: 0;
    padding: 0;
+}
+p.is-editor-empty:first-child::before {
+   color: #838383;
+   content: attr(data-placeholder);
+   float: left;
+   height: 0;
+   pointer-events: none;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
    <div class="h-full w-full">
-      <div v-if="content !== null && content.data !== null && fileData !== null">
+      <div v-if="content !== null && content.data !== null && fileData !== null" class="h-full">
          <NoteEditor
             v-if="typeof content.data == 'string' || content.data.type == 'NOTE'"
             :content="typeof content.data == 'string' ? content.data : content.data.content"

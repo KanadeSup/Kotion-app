@@ -1,14 +1,17 @@
 <template>
    <label
       for="image-input"
-      :class="cn('w-2/6 shrink-0 border rounded-lg  cursor-pointer hover:bg-accent', props.class)"
+      :class="
+         cn(
+            'w-2/6 shrink-0 border rounded-lg  cursor-pointer hover:bg-accent overflow-hidden',
+            props.class,
+         )
+      "
    >
       <AspectRatio :ratio="13 / 9" class="flex items-center justify-center">
-         <IconUpload class="w-9 h-9 text-gray-400" v-if="!imgUrl"/>
+         <IconUpload class="w-9 h-9 text-gray-400" v-if="!imgUrl" />
          <div v-else class="w-full h-full">
-            <img :src="imgUrl" 
-               class="object-cover  w-full h-full"
-            />
+            <img :src="convertFileSrc(imgUrl)" class="object-cover w-full h-full" />
          </div>
       </AspectRatio>
       <input
@@ -23,16 +26,18 @@
 
 <script setup lang="ts">
 import { IconUpload } from "@tabler/icons-vue";
+import { convertFileSrc } from "@tauri-apps/api/core";
 import type { HTMLAttributes, PropType } from "vue";
 
 type PROPS = {
    class?: HTMLAttributes["class"];
+   defaultImgUrl?: string | null;
 };
 const props = defineProps<PROPS>();
 const model = defineModel("value", {
    type: Object as PropType<File | null>,
 });
-const imgUrl = ref("")
+const imgUrl = ref(props.defaultImgUrl);
 
 function handleFileChange(event: Event) {
    const input = event.target as HTMLInputElement;
