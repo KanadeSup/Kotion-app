@@ -1,5 +1,5 @@
 <template>
-   <div class="border border-[#444] rounded-md overflow-hidden bg-[#0C0A09] cursor-pointer">
+   <div class="border border-[#444] rounded-md overflow-hidden bg-[#0C0A09] cursor-pointer hover:border-gray-600">
       <AspectRatio :ratio="13 / 9" class="flex items-center justify-center border-b">
          <img
             v-if="data.image"

@@ -1,5 +1,5 @@
 <template>
-   <div>
+   <div class="overflow-auto h-full">
       <div class="overflow-auto h-full" v-if="!galleryStore.isEditPageOpen">
          <Header />
          <VueDraggable
