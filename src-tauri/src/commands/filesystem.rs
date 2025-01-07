@@ -171,7 +171,12 @@ pub fn save_file_content_command(file_path: &str, content: &str) -> CommandResul
 }
 
 #[tauri::command]
-pub fn save_file_binary(file_path: &str, data: Vec<u8>) -> CommandResult<&str> {
+pub fn save_file_binary_command(file_path: &str, data: Vec<u8>) -> CommandResult<&str> {
+   if let Some(dir_path) = Path::new(file_path).parent() {
+      if !dir_path.exists() {
+         fs::create_dir_all(dir_path).unwrap();
+     }
+   }
    fs::write(file_path, data).unwrap();
    CommandResult {
       data: file_path,

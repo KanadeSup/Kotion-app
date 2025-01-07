@@ -40,7 +40,7 @@ export async function saveFileContent(path: string, content: string) {
 // save_file_binary
 export async function saveImage(path: string, data: File) {
    const buffer = await data.arrayBuffer();
-   return (await invoke("save_file_binary", {
+   return (await invoke("save_file_binary_command", {
       filePath: path,
       data: Array.from(new Uint8Array(buffer)),
    })) as CommandResposne<string>;
