@@ -25,15 +25,52 @@ export type GalleryPropertyBase = {
 
 export type GalleryTitleProperty = GalleryPropertyBase & {
    type: "title";
-   value: string;
+   value: GalleryTitleValue;
 };
+
+export type GalleryTextProperty = GalleryPropertyBase & {
+   type: "text";
+   value: GalleryTextValue;
+};
+
+export type GalleryRatingProperty = GalleryPropertyBase & {
+   type: "rating";
+   value: GalleryRatingValue;
+};
+
+export type GalleryUrlProperty = GalleryPropertyBase & {
+   type: "url";
+   value: GalleryUrlValue;
+};
+
+export type GalleryTagValue = {
+   value: string;
+   color: string;
+};
+
+export type GalleryUrlValue = string;
+
+export type GalleryTextValue = string;
+
+export type GalleryTitleValue = string;
+
+export type GalleryRatingValue = number;
 
 export type GalleryTagProperty = GalleryPropertyBase & {
    type: "tag";
-   value: string[];
+   value: GalleryTagValue[];
 };
 
-export type GalleryProperty = GalleryTitleProperty | GalleryTagProperty;
+export type GalleryProperty =
+   | GalleryTitleProperty
+   | GalleryTextProperty
+   | GalleryRatingProperty
+   | GalleryUrlProperty
+   | GalleryTagProperty;
+
+export type GalleryGlobalData = {
+   properties?: GalleryTagValue[] | null;
+};
 
 export type GalleryItem = {
    id: string;
@@ -42,6 +79,7 @@ export type GalleryItem = {
    content: JSONContent | string;
 };
 export type GalleryJson = {
+   globalData?: GalleryGlobalData;
    items: GalleryItem[];
    setting: {};
 };
