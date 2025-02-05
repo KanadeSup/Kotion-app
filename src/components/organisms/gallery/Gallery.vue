@@ -10,9 +10,9 @@
          >
             <GalleryCard
                v-for="item in data.items"
-               :key="item.id"
+               :key="item.uuid"
                :data="item"
-               @click="galleryStore.openUpdatePage(item.id)"
+               @click="galleryStore.openUpdatePage(item.uuid)"
             />
          </VueDraggable>
       </div>

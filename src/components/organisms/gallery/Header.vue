@@ -18,6 +18,6 @@ import { IconPlus } from "@tabler/icons-vue";
 const galleryStore = useGalleryStore();
 function handleNewItem() {
    const newItem = galleryStore.addItem(null);
-   galleryStore.openUpdatePage(newItem.id);
+   galleryStore.openUpdatePage(newItem.uuid);
 }
 </script>

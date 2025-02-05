@@ -45,7 +45,7 @@ watch(imageRef, async (value, _) => {
    const res = await saveImage(filePath, value);
    if (!res.ok) return;
    editItem.image = res.data;
-   galleryStore.updateItem(editItem.id, editItem);
+   galleryStore.updateItem(editItem.uuid, editItem);
    galleryStore.save();
 });
 let isSaved = true;
@@ -55,7 +55,7 @@ const throttleSaveContent = _.throttle(async (editor) => {
    const editItem = galleryStore.editItem;
    if (!editItem) return;
    editItem.content = content;
-   galleryStore.updateItem(editItem.id, editItem);
+   galleryStore.updateItem(editItem.uuid, editItem);
    galleryStore.save();
    isSaved = false;
 }, 500);
@@ -71,7 +71,7 @@ onUnmounted(async () => {
    const jsonContent = editorRef.value.getJsonContent();
    if (jsonContent) {
       editItem.content = jsonContent;
-      galleryStore.updateItem(editItem.id, editItem);
+      galleryStore.updateItem(editItem.uuid, editItem);
       galleryStore.save();
    }
 });
