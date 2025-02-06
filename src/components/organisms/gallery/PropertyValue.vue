@@ -27,7 +27,15 @@
       </div>
       <!-- tag property -->
       <div v-if="type == 'tag'">
-         <TagsSelector :items="items" />
+         <TagsSelector
+            :default-value="value as GalleryTagValue[]"
+            :select-items="galleryStore.data?.globalData.properties"
+            @change="
+               (values) => {
+                  emit('update', type, values);
+               }
+            "
+         />
       </div>
    </div>
 </template>
@@ -57,6 +65,7 @@ const props = defineProps<PROPS>();
 const emit = defineEmits<{
    update: [type: PropertyType, value: PropertyValue];
 }>();
+const galleryStore = useGalleryStore();
 const inputValue = ref(props.value);
 const inputRef = ref<HTMLInputElement>();
 const isEditEnable = ref(false);
@@ -73,22 +82,4 @@ function enableEdit() {
       }
    });
 }
-const items = [
-   {
-      value: "adsada dasd",
-      color: "#a82020",
-   },
-   {
-      value: "123",
-      color: "#a82020",
-   },
-   {
-      value: "456",
-      color: "#a82020",
-   },
-   {
-      value: "0000 dasd",
-      color: "#a82020",
-   },
-];
 </script>

@@ -206,6 +206,7 @@ function createEmptyGalleryJson() {
    const galleryJson: GalleryFileContent = {
       type: "GALLERY",
       content: {
+         globalData: {},
          items: [],
          setting: {}
       },

@@ -3,7 +3,7 @@
       <div
          :class="
             cn(
-               'border rounded-md px-2 py-1 w-full flex justify-start items-center flex-wrap gap-2',
+               'hover:bg-accent rounded-md px-2 py-1 w-full flex justify-start items-center flex-wrap gap-2 cursor-pointer',
                props.class,
             )
          "
@@ -12,14 +12,15 @@
          <p
             v-if="valueRef?.length == 0"
             class="text-muted-foreground"
-            :class="!placeholder && 'invisible'"
+            :class="!placeholder && 'text-muted-foreground'"
          >
-            {{ placeholder ? placeholder : "empty" }}
+            {{ placeholder ? placeholder : "Empty" }}
          </p>
          <span
             v-for="item in valueRef"
+            :key="item.value"
             :style="{ backgroundColor: item.color }"
-            class="px-1 rounded-md flex items-center gap-1"
+            class="px-2 rounded-md flex items-center gap-1"
          >
             {{ item.value }}
             <IconX
@@ -33,9 +34,14 @@
             />
          </span>
       </div>
-      <div class="w-full border rounded-md p-1 mt-1 absolute z-50 bg-[#000000be]" v-if="open == true">
+      <div
+         class="w-full border rounded-md p-1 mt-1 absolute z-50 bg-[#000000be]"
+         v-if="open == true"
+      >
          <div
             v-for="item in selectItems"
+            v-show="valueRef.findIndex(opt => opt.value === item.value) == -1"
+            :key="item.value"
             class="cursor-pointer hover:bg-accent p-1 px-3 rounded-md"
             @click="handleClickItem(item)"
          >
@@ -43,7 +49,7 @@
                {{ item.value }}
             </span>
          </div>
-         <div v-if="selectItems?.length == 0" class="text-muted-foreground px-2 py-1">
+         <div v-if="!selectItems || selectItems?.length === valueRef.length" class="text-muted-foreground px-2 py-1">
             There is no items
          </div>
       </div>
@@ -61,30 +67,29 @@ import type { HTMLAttributes } from "vue";
 import type { GalleryTagValue } from "~/types/fileSystem";
 
 const props = defineProps<{
-   items?: GalleryTagValue[];
+   defaultValue?: GalleryTagValue[] | null;
+   selectItems?: GalleryTagValue[] | null;
    placeholder?: string;
    class?: HTMLAttributes["class"];
 }>();
 
 const open = ref(false);
-const selectItems = ref(props.items);
-const valueRef = ref<GalleryTagValue[]>([])
-   const emit = defineEmits<{
-  (e: 'change', value: GalleryTagValue[]): void
-}>()
+const valueRef = ref<GalleryTagValue[]>(props.defaultValue ? [...props.defaultValue] : []);
+const emit = defineEmits<{
+   (e: "change", value: GalleryTagValue[]): void;
+}>();
 
 function handleClickItem(item: GalleryTagValue) {
-   if (!selectItems.value) return;
-   const removeIndex = selectItems.value.indexOf(item);
-   const selectedvalue = selectItems.value.splice(removeIndex, 1)[0];
+   if (!props.selectItems) return;
+   const index = props.selectItems.indexOf(item);
+   const selectedvalue = props.selectItems[index];
    valueRef.value.push(selectedvalue);
-   emit("change", valueRef.value)
+   emit("change", valueRef.value);
 }
 function unSelect(item: GalleryTagValue) {
    if (!valueRef.value || valueRef.value.length == 0) return;
    const removeIndex = valueRef.value.indexOf(item);
-   const unSelectItem = valueRef.value.splice(removeIndex, 1)[0];
-   selectItems.value?.push(unSelectItem);
-   emit("change", valueRef.value)
+   valueRef.value.splice(removeIndex, 1)[0];
+   emit("change", valueRef.value);
 }
 </script>

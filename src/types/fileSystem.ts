@@ -82,7 +82,7 @@ export type GalleryItem = {
    content: JSONContent | string;
 };
 export type GalleryJson = {
-   globalData?: GalleryGlobalData;
+   globalData: GalleryGlobalData;
    items: GalleryItem[];
    setting: {};
 };

@@ -18,7 +18,8 @@
             </div>
          </div>
          <div v-else>
-            <PropertyTextEdit v-if="type == 'text'"  :uuid="uuid"/>
+            <PropertyTextEdit v-if="type == 'text'" :uuid="uuid" />
+            <PropertyTagEdit v-if="type == 'tag'" :uuid="uuid" />
          </div>
       </popover-content>
    </Popover>
@@ -28,6 +29,7 @@
 <script setup lang="ts">
 import { IconEdit, IconTrash } from "@tabler/icons-vue";
 import PropertyTextEdit from "./PropertyTextEdit.vue";
+import PropertyTagEdit from "./PropertyTagEdit.vue";
 
 type PROPS = {
    type: "text" | "tag" | "rating" | "url" | "title",
