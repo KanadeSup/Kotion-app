@@ -11,7 +11,7 @@
       <AspectRatio :ratio="13 / 9" class="flex items-center justify-center">
          <IconUpload class="w-9 h-9 text-gray-400" v-if="!imgUrl" />
          <div v-else class="w-full h-full">
-            <img :src="convertFileSrc(imgUrl)" class="object-cover w-full h-full" />
+            <img :src="convertFileSrc(defaultImgUrl ? defaultImgUrl : '')" class="object-cover w-full h-full" />
          </div>
       </AspectRatio>
       <input
@@ -43,7 +43,7 @@ function handleFileChange(event: Event) {
    const input = event.target as HTMLInputElement;
    if (input.files && input.files[0]) {
       model.value = input.files[0];
-      imgUrl.value = URL.createObjectURL(input.files[0]);
+      // imgUrl.value = URL.createObjectURL(input.files[0]);
    }
 }
 </script>
