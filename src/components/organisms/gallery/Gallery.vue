@@ -6,7 +6,7 @@
             :animation="50"
             ghostClass="ghost"
             v-model="data.items"
-            class="px-5 py-5 grid 2xl:grid-cols-6 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-5"
+            class="px-5 py-5 grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 gap-5"
          >
             <GalleryCard
                v-for="item in data.items"
