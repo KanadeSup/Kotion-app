@@ -145,7 +145,7 @@ fn list_vault_files(vault_path: &str) -> Option<Vec<FileSystemEntry>> {
 #[tauri::command]
 pub fn get_file_content_command(file_path: &str) -> CommandResult<Option<String>> {
    let file_path = Path::new(file_path);
-   if !file_path.exists() && file_path.is_dir() {
+   if !file_path.exists() || file_path.is_dir() {
       return CommandResult {
          data: None,
          ok: false,

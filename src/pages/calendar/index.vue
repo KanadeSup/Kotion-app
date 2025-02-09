@@ -18,7 +18,12 @@
          </div>
       </div>
       <FullCalendar ref="calendar" :options="calendarOptions" />
-      <EventModal ref="eventModalRef" @close="calendar?.getApi().unselect()" />
+      <EventModal 
+         ref="eventModalRef"
+         @close="calendar?.getApi().unselect()"
+         @submit="handleSubmitEventModal"
+         @delete="deleteEvent"
+      />
    </div>
 </template>
 
@@ -29,12 +34,17 @@ import interactionPlugin from "@fullcalendar/interaction";
 import "~/assets/css/calendar.css";
 import { IconChevronLeft, IconChevronRight, IconRectangle } from "@tabler/icons-vue";
 import IconButton from "~/components/atoms/IconButton.vue";
-import type { DateSelectArg } from "@fullcalendar/core/index.js";
-import EventModal from "./EventModal.vue";
+import type { DateSelectArg, EventInput } from "@fullcalendar/core/index.js";
+import EventModal, { type InputValue } from "./EventModal.vue";
+import type { MyCalendarEvent, MyCalendarOptions } from "~/types/calendar";
+import { v4 as uuidv4 } from "uuid";
+import { generateRepeatedEvents } from "~/utils/calendarHelper";
+import { repeat, update } from "lodash";
 
 const eventModalRef = ref<InstanceType<typeof EventModal> | null>(null);
 const calendar = ref<null|InstanceType<typeof FullCalendar>>(null);
-const calendarOptions = {
+const calendarStore = useCalendarStore()
+const calendarOptions = ref<MyCalendarOptions>({
    plugins: [timeGridPlugin, interactionPlugin],
    initialView: "timeGridWeek",
    headerToolbar: {
@@ -58,19 +68,93 @@ const calendarOptions = {
    expandRows: true,
    contentHeight: "auto",
    selectable: true,
-   selectMirror: true,
    select: function (info: DateSelectArg) {
       handleTimeSelect(info);
    },
+   editable: true,
    unselectAuto: false,
    unselectCancel: ".event-modal",
-};
+   events: [],
+   eventChange: (changeInfo) => {
+      const updateEvent = calendarStore.events.find(e => e.id === changeInfo.oldEvent.id);
+      if(!updateEvent) return;
+      updateEvent.start = changeInfo.event.startStr;
+      updateEvent.end = changeInfo.event.endStr;
+      calendarStore.saveEvents();
+   },
+   eventClick: (eventInfo) => {
+      const event = calendarStore.events.find(e => e.id == eventInfo.event.id)
+      if(!event) throw Error("cannot find event with id")
+      eventModalRef.value?.openUpdateModal(event)
+   }
+});
+
 
 function handleTimeSelect(info: DateSelectArg) {
    const eventModal = eventModalRef.value;
    if (!eventModal) return;
-   eventModal.openModal(info);
+   eventModal.openCreateModal(info);
 }
+
+function handleSubmitEventModal(values: InputValue, id?: string) {
+   if(!id) {
+      createEvent(values);
+   } else {
+      updateEvent(values, id)
+   }
+}
+function createEvent(values: InputValue) {
+   switch(values.repeat) {
+      case "no-repeat":  {
+         calendarStore.events.push({
+            id: uuidv4(),
+            title: values.name,
+            start: values.startAt.toISOString(),
+            end: values.endAt.toISOString(),
+            backgroundColor: values.color
+         })
+         break;
+      }
+      case "weekly":
+      case "weekday":
+      case "daily": {
+         const event: MyCalendarEvent = {
+            groupId: uuidv4(),
+            title: values.name,
+            start: values.startAt.toISOString(),
+            end: values.endAt.toISOString(),
+            backgroundColor: values.color
+         }
+         const repeatedEvents = generateRepeatedEvents(event, values.repeat)
+         repeatedEvents.forEach(repeatedEvent => {
+            calendarStore.events.push(repeatedEvent)
+         })
+         break
+      }
+   }
+   calendarOptions.value.events = calendarStore.events
+   calendarStore.saveEvents()
+}
+function updateEvent(values: InputValue, id: string) {
+   const updateEvent = calendarStore.events.find(e => e.id == id)
+   if(!updateEvent) throw Error("cannot find event with id")
+   updateEvent.title = values.name;
+   updateEvent.start = values.startAt.toISOString();
+   updateEvent.end = values.endAt.toISOString();
+   updateEvent.backgroundColor = values.color;
+   calendarStore.saveEvents()
+}
+function deleteEvent(id: string) {
+   const deleteIndex = calendarStore.events.findIndex(e => e.id == id);
+   if(deleteIndex == -1) throw Error("cannot find event with id");
+   calendarStore.events.splice(deleteIndex,1);
+   calendarStore.saveEvents();
+}
+
+onMounted(async ()=> {
+   await calendarStore.fetchEvents();
+   calendarOptions.value.events = calendarStore.events;
+})
 </script>
 
 <style>
