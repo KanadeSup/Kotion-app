@@ -23,11 +23,11 @@
                         <SelectItem value="daily">
                            Daily
                         </SelectItem>
-                        <SelectItem value="weekly">
-                           Weekly
-                        </SelectItem>
                         <SelectItem value="weekday">
                            Every weekday
+                        </SelectItem>
+                        <SelectItem value="weekly">
+                           Weekly
                         </SelectItem>
                      </SelectGroup>
                   </SelectContent>
