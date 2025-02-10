@@ -33,6 +33,14 @@ function selectTime(event: MouseEvent) {
    if (!value) return;
    timeValue.value = value;
 }
+watch([dateValue, timeValue], (values) => {
+   const date = values[0]
+   const time = values[1]
+   if(!date || !time) return
+   const hours = Number(time.split(":")[0])
+   const minutes =  Number(time.split(":")[1])
+   dateTimeValue.value = new Date(date.year, date.month, date.day, hours, minutes)
+})
 </script>
 
 <template>
